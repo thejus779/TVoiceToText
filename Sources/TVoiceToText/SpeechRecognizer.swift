@@ -65,6 +65,14 @@ extension CasinoSpeechRecognizer {
 
     // Should not be called before the previous recognitionTask ends
     private func startRecording() {
+        // Can't record when the user is using the phone on call
+        
+        guard !isOnPhoneCall else {
+            textFromSpeech = defaultMessageForTextFromSpeech
+            unableToStartAudioSession()
+            print("Ongoing Call")
+            return
+        }
         
         // Clear all previous session data and cancel task
         clearPreviousRequest()
@@ -140,5 +148,8 @@ extension CasinoSpeechRecognizer {
     func startSpeechRecordingAgain() {
         textFromSpeech = ""
         startSpeechRecording()
+    }
+    private var isOnPhoneCall: Bool {
+        return CXCallObserver().calls.contains { $0.hasEnded == false }
     }
 }
